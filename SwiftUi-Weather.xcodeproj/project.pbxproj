@@ -19,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2C425564299BD92F004F9D28 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		2CB256B0292D027B0040C11E /* SwiftUi-Weather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SwiftUi-Weather.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CB256B3292D027B0040C11E /* SwiftUi_WeatherApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUi_WeatherApp.swift; sourceTree = "<group>"; };
 		2CB256B5292D027B0040C11E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -61,9 +62,10 @@
 		2CB256B2292D027B0040C11E /* SwiftUi-Weather */ = {
 			isa = PBXGroup;
 			children = (
+				2C425564299BD92F004F9D28 /* Info.plist */,
 				2CB256B3292D027B0040C11E /* SwiftUi_WeatherApp.swift */,
 				2CB256B5292D027B0040C11E /* ContentView.swift */,
-				2CB256CD292D48CE0040C11E /* All */,
+				2CB256CD292D48CE0040C11E /* Components */,
 				2CB256B7292D027C0040C11E /* Assets.xcassets */,
 				2CB256B9292D027C0040C11E /* Preview Content */,
 			);
@@ -78,7 +80,7 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		2CB256CD292D48CE0040C11E /* All */ = {
+		2CB256CD292D48CE0040C11E /* Components */ = {
 			isa = PBXGroup;
 			children = (
 				2CB256CB292D47840040C11E /* City_Text.swift */,
@@ -87,7 +89,7 @@
 				2CB256C5292D3C8E0040C11E /* Buttom.swift */,
 				2CB256C9292D45E60040C11E /* Background.swift */,
 			);
-			path = All;
+			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -297,7 +299,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftUi-Weather/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_FILE = "SwiftUi-Weather/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -325,7 +327,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftUi-Weather/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_FILE = "SwiftUi-Weather/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
