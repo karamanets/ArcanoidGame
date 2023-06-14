@@ -28,13 +28,15 @@ class ViewController: UIViewController {
         attribute.font = UIFont.systemFont(ofSize: 30, weight: .semibold, width: .compressed)
         configuration.attributedTitle = AttributedString("Start", attributes: attribute)
 
-        let button = UIButton(configuration: configuration, primaryAction: buttonAction())
+        let button = UIButton(configuration: configuration, primaryAction: startButtonAction())
+        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     private let backgroundView: UIImageView = {
         let image = UIImage(named: "background")
         let view = UIImageView(image: image)
+        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -49,9 +51,20 @@ class ViewController: UIViewController {
     
     private var startLabel: UILabel = {
         let view = UILabel()
-        view.font = UIFont.systemFont(ofSize: 45, weight: .bold, width: .condensed)
-        view.textColor = .white
+        view.font = UIFont.systemFont(ofSize: 55, weight: .bold, width: .condensed)
+        view.textColor = .red
         view.alpha = 0.0
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private var gameOverLabel: UILabel = {
+        let view = UILabel()
+        view.font = UIFont.systemFont(ofSize: 55, weight: .bold, width: .condensed)
+        view.textColor = .red
+        view.text = "Game Over"
+        view.alpha = 0.0
+        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -62,30 +75,57 @@ class ViewController: UIViewController {
     private var centerRocket: CGPoint!
     
     private var ball: GameBall!
+    
+    private var gameTimer = Timer()
 }
 
 //MARK: Private Methods
 private extension ViewController {
     
     func initialize() {
-        ///View
-        view.backgroundColor = .white
-        backgroundView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height)
+  
         view.addSubview(backgroundView)
+        NSLayoutConstraint.activate([
+            backgroundView.topAnchor.constraint(equalTo: view.topAnchor),
+            backgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            backgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
         
-        startButton.frame = CGRect(x: 0, y: 0, width: 130, height: 40)
-        startButton.center = view.center
         view.addSubview(startButton)
+        NSLayoutConstraint.activate([
+            startButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            startButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            startButton.widthAnchor.constraint(equalToConstant: 130),
+            startButton.heightAnchor.constraint(equalToConstant: 45)
+        ])
         
-        startLabel.frame = CGRect(x: view.bounds.width / 2, y: (view.bounds.height / 2) - 75 , width: 130, height: 65)
+        
         view.addSubview(startLabel)
+        NSLayoutConstraint.activate([
+            startLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            startLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -view.bounds.height / 3)
+        ])
+        
+        view.addSubview(gameOverLabel)
+        NSLayoutConstraint.activate([
+            gameOverLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            gameOverLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -view.bounds.height / 3)
+        ])
+        
     }
     
     func addRocket() {
-        rocketView.frame = CGRect(x: 30, y: Int(view.frame.height) - 120, width: 140, height: 100)
+        view.addSubview(rocketView)
+        let startLeft = Int(view.bounds.width / 3)
+        let startBottom = Int(view.frame.height) - Int(view.bounds.width / 3)
+        let height = 100
+        let width = 140
+        
+        rocketView.frame = CGRect(x: startLeft, y: startBottom, width: width, height: height)
+        
         let pan = UIPanGestureRecognizer(target: self, action: #selector(panAction))
         rocketView.gestureRecognizers = [pan]
-        view.addSubview(rocketView)
     }
     
     func addBall() {
@@ -93,14 +133,26 @@ private extension ViewController {
     }
     
     func start() {
-        Timer.scheduledTimer(withTimeInterval: 0.012, repeats: true) { [weak self] _ in
-            self?.ball.start()
-        }
-    }
-    
-    func updateWithAnimation(task: @escaping () -> Void, completion: @escaping () -> Void ) {
-        UIView.animate(withDuration: 0.5, animations: task) { _ in
-            UIView.animate(withDuration: 0.5, animations: completion)
+        gameTimer = Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.ball.start()
+            
+            ///📌 GameOver
+            if self.ball.isOver == true {
+                self.gameTimer.invalidate()
+                UIView.animate(withDuration: 0.2) {
+                    self.rocketView.alpha = 0.0
+                    self.gameOverLabel.alpha = 1.0
+                    UIView.animate(withDuration: 0.2, delay: 2) {
+                        self.ball.blocksView.map({ $0.alpha = 0.0})
+                        self.ball.blocksView.removeAll()
+                        UIView.animate(withDuration: 0.2, delay: 2) {
+                            self.startButton.alpha = 1.0
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -110,7 +162,7 @@ private extension ViewController {
     
     func startCountAnimate() {
         DispatchQueue.main.async {
-            self.updateWithAnimation {
+            Utility.updateWithAnimation {
                 self.startLabel.text = "\(self.count)"
                 self.startLabel.alpha = 1.0
             } completion: {
@@ -123,12 +175,14 @@ private extension ViewController {
 //MARK: Actions
 private extension ViewController {
     
-    func buttonAction() -> UIAction {
+    func startButtonAction() -> UIAction {
         let action = UIAction { [weak self] _ in
             guard let self = self else { return }
             DispatchQueue.main.async {
-                self.updateWithAnimation {
+                Utility.updateWithAnimation {
                     self.startButton.alpha = 0.0
+                    self.gameOverLabel.alpha = 0.0
+                    self.rocketView.alpha = 1.0
                 } completion: {
                     self.addRocket()
                     self.addBall()
@@ -148,7 +202,7 @@ private extension ViewController {
         rocketView.center = newCenter
     }
     
-    @objc func startCountAction() {
+    @objc func startCountAction(_ sender: UIButton) {
         count += 1
         if count == 1 {
             startCountAnimate()
@@ -159,6 +213,7 @@ private extension ViewController {
             timer.invalidate()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 self.start()
+                self.count = 0
             }
         }
     }

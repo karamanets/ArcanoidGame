@@ -8,12 +8,14 @@
 import UIKit
 
 //MARK: Ball
-struct GameBall {
+class GameBall {
     
     //MARK: Public
-    public mutating func start() {
-        tic()
-    }
+    public func start() { tic() }
+    
+    public var isOver: Bool = false
+    
+    public var level: Int = 2
     
     //MARK: Init
     init(in viewParent: UIView, viewRocket: UIView) {
@@ -43,13 +45,13 @@ struct GameBall {
     private var viewBall: UIView
     private var viewParent: UIView
     private var viewRocket: UIView
-    private var blocksView: [UIView] = []
+    var blocksView: [UIView] = []
 }
 
 //MARK: Private Methods
 private extension GameBall {
  
-    mutating func tic() {
+    func tic() {
         let newCenter = CGPoint(x: center.x + vector.dx, y: center.y + vector.dy)
         
         ///📌  Hit Rocket
@@ -94,30 +96,30 @@ private extension GameBall {
         
         if newCenter.x >= viewParent.frame.width || newCenter.x <= 0 {
             vector.b.x = -vector.b.x
+            
         }
         
         if newCenter.y >= viewParent.frame.height || newCenter.y <= 0 {
             vector.b.y = -vector.b.y
-            print("Hit Bottom") //Reload
+            
+            if newCenter.y >= viewParent.frame.height {
+                ///📌 Hit Bottom Reload
+                    isOver = true
+            }
         }
     }
     
-    mutating func addBlocks() {
-        for _ in 0...150 {
+    func addBlocks() {
+        for _ in 1...level {
             let block = UIView(frame: CGRect(x: Int(CGFloat.random(in: 0...viewParent.bounds.size.width - 50)),
                                              y: Int(CGFloat.random(in: 50...viewParent.bounds.height / 3)),
-                                             width: 50,
-                                             height: 50))
+                                             width: 40,
+                                             height: 40))
             viewParent.addSubview(block)
             
-            let image = [UIImage(named: "block1"),
-                         UIImage(named: "block2"),
-                         UIImage(named: "block3"),
-                         UIImage(named: "block4"),
-                         UIImage(named: "block5")].randomElement() ?? UIImage()
-            
+            let image = Utility.getImage()
             let imageView = UIImageView(image: image )
-            imageView.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+            imageView.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
             block.addSubview(imageView)
             
             self.blocksView.append(block)
@@ -170,15 +172,4 @@ private extension GameBall {
     }
 }
 
-//MARK: Vector for Ball
-fileprivate struct Vector {
-    var a: CGPoint
-    var b: CGPoint
-    
-    var dx: CGFloat {
-        return b.x - a.x
-    }
-    var dy: CGFloat {
-        return b.y - a.y
-    }
-}
+
