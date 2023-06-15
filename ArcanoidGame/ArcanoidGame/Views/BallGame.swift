@@ -13,24 +13,26 @@ class GameBall {
     //MARK: Public
     public func start() { tic() }
     
+    public var blocksView: [UIView] = []
+    
     public var isOver: Bool = false
     
-    public var level: Int = 2
-    
     //MARK: Init
-    init(in viewParent: UIView, viewRocket: UIView) {
+    init(in viewParent: UIView,
+         viewRocket: UIView,
+         level: Int,
+         ballImage: UIImageView)
+    {
         self.viewParent = viewParent
         self.viewRocket = viewRocket
+        self.level = level
         
         center = viewParent.center
-        vector = Vector(a: CGPoint(x: 0, y: 0), b: CGPoint(x: 5, y: 5))
+        vector = Vector(a: CGPoint(x: 0, y: 0), b: CGPoint(x: 7, y: 7))
         
         ///Ball
         viewBall = UIView()
-        let image = UIImage(named: "ball")
-        let imageView = UIImageView(image: image)
-        imageView.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
-        viewBall.addSubview(imageView)
+        viewBall.addSubview(ballImage)
         viewBall.center = center
         viewParent.addSubview(viewBall)
         
@@ -38,14 +40,20 @@ class GameBall {
         addBlocks()
     }
     
+    deinit {
+        print("🔥 Deinit GameBall")
+        self.blocksView = []
+    }
+    
     //MARK: Private Property
+    private var level: Int
+    
     private var center: CGPoint
     private var vector: Vector
     
     private var viewBall: UIView
     private var viewParent: UIView
     private var viewRocket: UIView
-    var blocksView: [UIView] = []
 }
 
 //MARK: Private Methods
@@ -110,9 +118,12 @@ private extension GameBall {
     }
     
     func addBlocks() {
-        for _ in 1...level {
-            let block = UIView(frame: CGRect(x: Int(CGFloat.random(in: 0...viewParent.bounds.size.width - 50)),
-                                             y: Int(CGFloat.random(in: 50...viewParent.bounds.height / 3)),
+        for _ in stride(from: 1, through: (level), by: 1) {
+            
+            let insetTop = viewParent.bounds.width / 5
+            
+            let block = UIView(frame: CGRect(x: Int(CGFloat.random(in: 6...viewParent.bounds.size.width - 46)),
+                                             y: Int(CGFloat.random(in: insetTop...viewParent.bounds.height / 3)),
                                              width: 40,
                                              height: 40))
             viewParent.addSubview(block)
