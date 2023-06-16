@@ -127,7 +127,6 @@ class ViewController: UIViewController {
             saveDataLevel()
         }
     }
-
 }
 
 //MARK: Private Methods
@@ -271,7 +270,7 @@ private extension ViewController {
             print("[⚠️] Error save Data level")
             return
         }
-        UserDefaults.setValue(data, forKey: "levelData")
+        UserDefaults.standard.set(data, forKey: "levelData")
     }
     
     func getDataLevel() {
@@ -339,4 +338,3 @@ private extension ViewController {
         }
     }
 }
-
