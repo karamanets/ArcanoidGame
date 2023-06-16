@@ -15,6 +15,16 @@ class ViewController: UIViewController {
         initialize()
     }
     
+    //MARK: Init
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nil, bundle: nil)
+        getDataLevel()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     //MARK: Private Property
     private lazy var startButton: UIButton = {
         var configuration = UIButton.Configuration.bordered()
@@ -51,7 +61,7 @@ class ViewController: UIViewController {
     
     private var startLabel: UILabel = {
         let view = UILabel()
-        view.font = UIFont.systemFont(ofSize: 55, weight: .bold, width: .condensed)
+        view.font = UIFont.systemFont(ofSize: 55, weight: .bold, width: .compressed)
         view.textColor = .red
         view.alpha = 0.0
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -60,7 +70,7 @@ class ViewController: UIViewController {
     
     private var gameOverLabel: UILabel = {
         let view = UILabel()
-        view.font = UIFont.systemFont(ofSize: 55, weight: .bold, width: .condensed)
+        view.font = UIFont.systemFont(ofSize: 55, weight: .bold, width: .compressed)
         view.textColor = .red
         view.text = "Game Over"
         view.alpha = 0.0
@@ -70,7 +80,7 @@ class ViewController: UIViewController {
     
     private var greetingLabel: UILabel = {
         let view = UILabel()
-        view.font = UIFont.systemFont(ofSize: 35, weight: .bold, width: .condensed)
+        view.font = UIFont.systemFont(ofSize: 35, weight: .bold, width: .compressed)
         view.textColor = .red
         view.alpha = 0.0
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -79,31 +89,21 @@ class ViewController: UIViewController {
     
     private var levelLabel: UILabel = {
         let view = UILabel()
-        view.font = UIFont.systemFont(ofSize: 20, weight: .medium)
+        view.font = UIFont.systemFont(ofSize: 18, weight: .medium, width: .compressed)
         view.textColor = .white.withAlphaComponent(0.8)
+        view.textAlignment = .center
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     private var scoreBlocksLabel: UILabel = {
         let view = UILabel()
-        view.font = UIFont.systemFont(ofSize: 20, weight: .medium)
+        view.font = UIFont.systemFont(ofSize: 18, weight: .medium, width: .compressed)
         view.textColor = .white.withAlphaComponent(0.8)
+        view.textAlignment = .center
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
-    private var centerRocket: CGPoint!
-    
-    private var ball: GameBall? = nil
-    
-    private var countStart: Int = 0
-    
-    private var timerStart = Timer()
-    
-    private var gameTimer = Timer()
-    
-    private var level: Int = 1
     
     private let ballImage: UIImageView = {
         let image = UIImage(named: "ball")
@@ -111,6 +111,23 @@ class ViewController: UIViewController {
         imageView.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
         return imageView
     }()
+    
+    private var centerRocket: CGPoint!
+    
+    private var ball: GameBall? = nil
+    
+    private var timerStart = Timer()
+    
+    private var gameTimer = Timer()
+    
+    private var countStart: Int = 0
+    
+    private var level: Int = 1 {
+        didSet {
+            saveDataLevel()
+        }
+    }
+
 }
 
 //MARK: Private Methods
@@ -154,14 +171,19 @@ private extension ViewController {
         
         view.addSubview(levelLabel)
         NSLayoutConstraint.activate([
-            levelLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            levelLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 48)
+            levelLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            levelLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 40),
+            levelLabel.widthAnchor.constraint(equalToConstant: view.bounds.width / 4),
+            levelLabel.heightAnchor.constraint(equalToConstant: 40)
+            
         ])
         
         view.addSubview(scoreBlocksLabel)
         NSLayoutConstraint.activate([
-            scoreBlocksLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            scoreBlocksLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 48)
+            scoreBlocksLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scoreBlocksLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 45),
+            scoreBlocksLabel.widthAnchor.constraint(equalToConstant: view.bounds.width / 4),
+            scoreBlocksLabel.heightAnchor.constraint(equalToConstant: 40)
         ])
         
     }
@@ -175,8 +197,8 @@ private extension ViewController {
             ball.start()
             
             ///📌 Start Level Game Labels
-            self.levelLabel.text = "🍄 Level: \(self.level) "
-            self.scoreBlocksLabel.text = "⚡️ Blocks: \(ball.blocksView.count)"
+            self.levelLabel.text = "👑 Level: \(self.level)"
+            self.scoreBlocksLabel.text = "🎖️Blocks: \(ball.blocksView.count)"
             
             ///📌 GameWin
             if ball.blocksView.count == 0 {
@@ -187,7 +209,7 @@ private extension ViewController {
                     self.rocketView.alpha = 0.0
                     UIView.animate(withDuration: 0.5, delay: 2) {
                         self.greetingLabel.alpha = 1.0
-                        self.greetingLabel.text = "🔥 Level \(self.level - 1) passed 🔥"
+                        self.greetingLabel.text = "🏆 Level - \(self.level - 1) - passed 🏆"
                         UIView.animate(withDuration: 0.5, delay: 3) {
                             self.startButton.alpha = 1.0
                         }
@@ -197,7 +219,7 @@ private extension ViewController {
             ///📌 GameOver
             if ball.isOver == true {
                 
-                self.level = 1
+                //self.level = 1
                 self.gameTimer.invalidate()
                 UIView.animate(withDuration: 0.5) {
                     self.rocketView.alpha = 0.0
@@ -235,13 +257,31 @@ private extension ViewController {
     
     func startCountAnimate() {
         DispatchQueue.main.async {
-            Utility.updateWithAnimation {
+            Utility.updateWithAnimation(time: 0.5, task: {
                 self.startLabel.text = "\(self.countStart)"
                 self.startLabel.alpha = 1.0
-            } completion: {
+            }, completion: {
                 self.startLabel.alpha = 0.0
-            }
+            })
         }
+    }
+    
+    func saveDataLevel() {
+        guard let data = try? JSONEncoder().encode(level) else {
+            print("[⚠️] Error save Data level")
+            return
+        }
+        UserDefaults.setValue(data, forKey: "levelData")
+    }
+    
+    func getDataLevel() {
+        guard
+            let data = UserDefaults.standard.data(forKey: "levelData"),
+            let level = try? JSONDecoder().decode(Int.self, from: data) else {
+            print("[⚠️] Error Decode Data level")
+            return
+        }
+        self.level = level
     }
 }
 
@@ -251,19 +291,24 @@ private extension ViewController {
     func startButtonAction() -> UIAction {
         let action = UIAction { [weak self] _ in
             guard let self = self else { return }
+            
             DispatchQueue.main.async {
-                Utility.updateWithAnimation {
-                    self.ball?.blocksView.map({ $0.removeFromSuperview() })
+                Utility.updateWithAnimation(time: 0.5, task: {
+                    if let ball = self.ball {
+                        for item in ball.blocksView {
+                            item.removeFromSuperview()
+                        }
+                    }
                     self.ball = nil
                     self.startButton.alpha = 0.0
                     self.gameOverLabel.alpha = 0.0
                     self.greetingLabel.alpha = 0.0
                     self.rocketView.alpha = 1.0
-                } completion: {
+                }, completion: {
                     self.addRocket()
                     self.addBall()
                     self.startCount()
-                }
+                })
             }
         }
         return action

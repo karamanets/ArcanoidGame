@@ -42,7 +42,6 @@ class GameBall {
     
     deinit {
         print("🔥 Deinit GameBall")
-        self.blocksView = []
     }
     
     //MARK: Private Property
@@ -54,6 +53,7 @@ class GameBall {
     private var viewBall: UIView
     private var viewParent: UIView
     private var viewRocket: UIView
+
 }
 
 //MARK: Private Methods
@@ -63,24 +63,26 @@ private extension GameBall {
         let newCenter = CGPoint(x: center.x + vector.dx, y: center.y + vector.dy)
         
         ///📌  Hit Rocket
-        if isHitRocket(rect: viewRocket.frame, oldPosition: center, newPosition: newCenter) == .x {
+        if isHit(rect: viewRocket.frame, oldPosition: center, newPosition: newCenter) == .x {
             vector.b.x = -vector.b.x
             vector.b.y = -vector.b.y + CGFloat.random(in: -3...3)
+            scaleRocketHit()
         }
-        if isHitRocket(rect: viewRocket.frame, oldPosition: center, newPosition: newCenter) == .y {
+        if isHit(rect: viewRocket.frame, oldPosition: center, newPosition: newCenter) == .y {
             vector.b.y = -vector.b.y
             vector.b.x = -vector.b.x + CGFloat.random(in: -2...2)
+            scaleRocketHit()
         }
         
         ///📌  Hit Blocks
         var indexBlock: Int?
         for (index, block) in blocksView.enumerated() {
-            if isHitRocket(rect: block.frame, oldPosition: center, newPosition: newCenter) == .x {
+            if isHit(rect: block.frame, oldPosition: center, newPosition: newCenter) == .x {
                 vector.b.x = -vector.b.x
                 vector.b.y = -vector.b.y + CGFloat.random(in: -2...2)
                 indexBlock = index
             }
-            if isHitRocket(rect: block.frame, oldPosition: center, newPosition: newCenter) == .y {
+            if isHit(rect: block.frame, oldPosition: center, newPosition: newCenter) == .y {
                 vector.b.y = -vector.b.y
                 vector.b.x = -vector.b.x + CGFloat.random(in: -2...2)
                 indexBlock = index
@@ -118,7 +120,7 @@ private extension GameBall {
     }
     
     func addBlocks() {
-        for _ in stride(from: 1, through: (level), by: 1) {
+        for _ in stride(from: 1, through: (level * 10), by: 1) {
             
             let insetTop = viewParent.bounds.width / 5
             
@@ -137,7 +139,7 @@ private extension GameBall {
         }
     }
     
-    func isHitRocket(rect: CGRect, oldPosition: CGPoint, newPosition: CGPoint) -> HitTarget? {
+    func isHit(rect: CGRect, oldPosition: CGPoint, newPosition: CGPoint) -> HitTarget? {
         
         ///📌 Ball hit Left rocket
         if oldPosition.x < rect.origin.x &&
@@ -175,6 +177,14 @@ private extension GameBall {
             return .y
         }
         return nil
+    }
+    
+    func scaleRocketHit() {
+        Utility.updateWithAnimation(time: 0.15, task: {
+            self.viewRocket.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        }, completion: {
+            self.viewRocket.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+        })
     }
     
     enum HitTarget {
